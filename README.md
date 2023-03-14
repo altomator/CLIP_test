@@ -16,6 +16,7 @@ Then the CLIP embeddings are computed with:
 ```
 >python3 model.py -f static
 ```
+The embeddings are saved in a Torch tensor named after the folder name (in our example, ``static_torch.pt``).
 
 Finally, launch the web app:
 ```
