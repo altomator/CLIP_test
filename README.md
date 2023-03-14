@@ -2,7 +2,7 @@
 
 This toy web app is leveraging the text-image CLIP model and a Flask web app coded by [ThorkildFregi](https://github.com/ThorkildFregi/CLIP-model-website).
 
-*Dependencies: flask, clip, PIL, torch, numpy *
+*Dependencies: flask, clip, PIL, torch, numpy*
 
 
 
