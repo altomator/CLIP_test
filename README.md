@@ -44,5 +44,8 @@ The results list shows the most likely images for the requested class, the assoc
 
 ## Information retrieval scenario
 
-In this scenario, a free request is inputed and the result list outputs the images ranked by probability.
+In this scenario, a free-form query is entered and the result list displays the images ranked in order of probability. In the example below, we are looking for cartoons of people in the street.
+
+![Classification](screen/CBIR.png)
+
 
