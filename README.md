@@ -38,7 +38,9 @@ For this use case, we want to use CLIP as a zero-shot classifier. The images typ
 - "a crossword grid"
 ...
 
-The result list shows the most likely images for the requested class, the associated probability and the second most likely class.
+The results list shows the most likely images for the requested class, the associated probability and the second most likely class. In this example, we are looking for crossword grids in newspapers.
+
+![Classification](screen/classify.png)
 
 ## Information retrieval scenario
 
