@@ -28,7 +28,7 @@ Note: The whole workflow can be run using the bash script ``run.sh``.
 
 The web app displays a random selection of images and a prompt field.
 
-
+![The web app](home.png)
 
 ## Classification scenario
 
