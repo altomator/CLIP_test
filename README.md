@@ -10,7 +10,7 @@ First, launch:
 ```
 >python3 recurse.py -f static > static_directory.txt
 ```
-if you want to process a folder of images named ``static`` (subfolders may be used within the root folder). It will generate the directory files list.
+if you want to process a folder of images named ``static`` (subfolders may be used within the root folder) stored in the application folder. It will generate the directory files list as a text file.
 
 Then the CLIP embeddings are computed with:
 ```
