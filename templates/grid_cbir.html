@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results for CLIP request</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/css/uikit.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit-icons.min.js"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+</head>
+<style>
+p.thumb {
+  margin-top: -15px;
+  margin-left: 5px;
+  font-size: 0.6em;
+  color: red;
+  padding: 0;
+  font-weight: normal
+}
+p {
+  padding: 5pt;
+  font-weight: bold
+}
+</style>
+<body>
+    <p><span style="font-weight: normal">Query:</span> {{query}} — {{comment}}</p>
+    <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 50 }'>
+        {% set e = 0 %}
+        {% for image in files %}
+            <div class="grid-item"><img src="{{image}}" width="250" height="400" alt="">
+              <p class="thumb">{{image}} ({{prob[loop.index-1]}})</p></div>
+        {% endfor %}
+    </div>
+    <p><a href="{{url_for('page')}}">Back to home page</a></p>
+</body>
+</html>

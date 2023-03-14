@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results for CLIP request</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/css/uikit.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit-icons.min.js"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+</head>
+<style>
+div.grid{
+  z-index: -1
+}
+img {
+  z-index: -2
+}
+p.bold {
+  padding: 5pt;
+  font-weight: bold
+}
+p.thumb {
+  margin-top: -1.5em;
+  margin-left: 5px;
+  font-size: 0.5em;
+  height: 1em;
+  color: red;
+  padding: 0;
+  font-weight: normal
+}
+p.bar {
+  margin-left: 5px;
+}
+div.bar {
+  z-index: 1;
+  margin-top: -1.75em;
+  height: 1.5em;
+  color: white;
+  background-color: gray;
+  padding: 0;
+  font-size: 0.6em;
+  font-weight: normal
+</style>
+<body>
+    <p class="bold"><span style="font-weight: normal">Class:</span> {{query}} — {{comment}}</p>
+    <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 50 }'>
+        {% for image in files %}
+            <div class="grid-item">
+            <img src="{{image}}" width="250" height="400" alt="">
+              <p class="thumb">{{image}} ({{loop.index}})</p>
+              <div class="bar"><p class="bar">{{targetClass}}: {{prob1[loop.index-1]}}</p></div>
+              <div class="bar" style="margin-top:0em;"><p class="bar">{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</p></div>
+            </div>
+        {% endfor %}
+    </div>
+    <p class="bold"><a href="{{url_for('page')}}">Back to main menu</a></p>
+</body>
+</html>
