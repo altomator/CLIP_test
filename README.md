@@ -24,10 +24,23 @@ Finally, launch the web app:
 ```
 and open this URL http://127.0.0.1:5000 in your browser.
 
-The whole workflow can be run using the bash script ``run.sh``.
+Note: The whole workflow can be run using the bash script ``run.sh``.
+
+The web app displays a random selection of images and a prompt field.
+
+
 
 ## Classification scenario
 
+For this use case, we want to use CLIP as a zero-shot classifier. The images types (classes) we want to classify are described in the main.py script as captions, e.g.:
+- "a photo"
+- "a map"
+- "a crossword grid"
+...
+
+The result list shows the most likely images for the requested class, the associated probability and the second most likely class.
 
 ## Information retrieval scenario
+
+In this scenario, a free request is inputed and the result list outputs the images ranked by probability.
 
