@@ -21,7 +21,7 @@ Finally, launch the web app:
 ```
 >flask --app main.py --debug run
 ```
-and open this 
+and open this URL http://127.0.0.1:5000 in your browser.
 
 The whole workflow can be run using the bash script ``run.sh``.
 
