@@ -9,14 +9,15 @@
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
 </head>
 <style>
-div.grid{
-  z-index: -1
-}
+#grid {
+   margin:15px;
+   z-index: -1
+ }
 img {
   z-index: -2
 }
-p.bold {
-  padding: 5pt;
+p.query {
+  padding: 10pt;
   font-weight: bold
 }
 p.thumb {
@@ -40,19 +41,36 @@ div.bar {
   padding: 0;
   font-size: 0.6em;
   font-weight: normal
+}
 </style>
 <body>
-    <p class="bold"><span style="font-weight: normal">Class:</span> {{query}} — {{comment}}</p>
-    <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 50 }'>
+    <p class="query"><span style="font-weight: normal">Class:</span> {{query}} / {{caption}} — {{comment}}</p>
+    <div id="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 250 }'>
         {% for image in files %}
             <div class="grid-item">
-            <img src="{{image}}" width="250" height="400" alt="">
-              <p class="thumb">{{image}} ({{loop.index}})</p>
+              <img src="{{image}}" width="250" height="400" alt="">
+              <p class="thumb">{{image|truncate(50)}} ({{loop.index}})</p>
               <div class="bar"><p class="bar">{{targetClass}}: {{prob1[loop.index-1]}}</p></div>
-              <div class="bar" style="margin-top:0em;"><p class="bar">{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</p></div>
+              <div class="bar" style="background-color: lightgray;margin-top:0em;"><p class="bar" style="background-color: lightgray">{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</p></div>
             </div>
         {% endfor %}
     </div>
-    <p class="bold"><a href="{{url_for('page')}}">Back to main menu</a></p>
+    <p class="query"><a href="{{url_for('page')}}">Back to main menu</a></p>
+
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
+    <script >
+    var grid = document.querySelector('#grid');
+
+    var msnry = new Masonry( grid, {
+  itemSelector: '.grid-item',
+  percentPosition: true
+});
+
+  imagesLoaded( grid ).on( 'progress', function() {
+  // layout Masonry after each image loads
+  msnry.layout();
+});
+
+    </script >
 </body>
 </html>

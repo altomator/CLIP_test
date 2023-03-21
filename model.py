@@ -14,20 +14,20 @@ import argparse
 ###
 parser = argparse.ArgumentParser(
                     prog = 'model.py',
-                    description = 'Generates the CLIP embeddings for a list of files'
+                    description = 'Generates the CLIP embeddings for a list of images'
                     )
-parser.add_argument('-f', '-folderName', help='the folder to be listed',required=True)
+parser.add_argument('-f', '-folderName', help='the folder to be processed (must be in static/)',required=True)
 args = parser.parse_args()
-img_folder = args.f
+img_folder = "static/"+args.f
 
 if not os.path.exists(img_folder):
     print("### '%s' folder does not exist! ###\n" % img_folder)
     quit()
 
-print("...reading directory for folder: ", img_folder)
-directory_file = img_folder+ ".txt"
+print("...reading directory list for: ", img_folder)
+directory_file = img_folder + ".txt"
 if not os.path.exists(directory_file):
-    print("### directory list for folder %s does not exist! ###\nPlease run \n>python recurse.py -f %s \nfirst" % (directory_file,img_folder))
+    print("### directory list for %s does not exist! ###\nPlease run \n>python recurse.py -f %s \nfirst" % (directory_file,img_folder))
     quit()
 
 with open(directory_file) as f:
@@ -65,7 +65,7 @@ print("...processing the images")
 
 for filename in image_paths:
     #name = os.path.splitext(filename)[0]
-    filename = filename[:-1]
+    filename = filename[:-1] # chop the last char = return
     if (i % 10 == 0):
         print(i, " : ", filename)
     image = Image.open(filename).convert("RGB")
@@ -80,6 +80,8 @@ with torch.no_grad():
     image_features = model.encode_image(image_input).float()
     image_features /= image_features.norm(dim=-1, keepdim=True)
 
-output = img_folder + "_torch.pt"
+#
+output = args.f +  "_torch.pt"
+
 print ("--> embeddings saved in %s\n" % output)
 torch.save(image_features, output)

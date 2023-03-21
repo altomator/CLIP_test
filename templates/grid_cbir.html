@@ -9,28 +9,49 @@
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
 </head>
 <style>
+#grid {
+   margin:15px;
+   z-index: 0;
+ }
 p.thumb {
-  margin-top: -15px;
+  margin-top: -1.5em;
   margin-left: 5px;
+  margin-bottom: 0;
   font-size: 0.6em;
   color: red;
-  padding: 0;
-  font-weight: normal
+  padding: 0pt;
+  font-weight: normal;
 }
-p {
-  padding: 5pt;
+p.query {
+  padding: 10pt;
   font-weight: bold
 }
 </style>
 <body>
-    <p><span style="font-weight: normal">Query:</span> {{query}} — {{comment}}</p>
-    <div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 50 }'>
+    <p class="query"><span style="font-weight: normal">Query:</span> {{query}} — {{comment}}</p>
+    <div id="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 250 }'>
         {% set e = 0 %}
         {% for image in files %}
-            <div class="grid-item"><img src="{{image}}" width="250" height="400" alt="">
+            <div class="grid-item">
+              <img src="{{image}}" width="250" height="400" alt="image">
               <p class="thumb">{{image}} ({{prob[loop.index-1]}})</p></div>
         {% endfor %}
     </div>
-    <p><a href="{{url_for('page')}}">Back to home page</a></p>
+    <p class="query"><a href="{{url_for('page')}}">Back to home page</a></p>
+
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
+    <script >
+    var grid = document.querySelector('#grid');
+
+    var msnry = new Masonry( grid, {
+  itemSelector: '.grid-item',
+  percentPosition: true
+});
+
+  imagesLoaded( grid ).on( 'progress', function() {
+  // layout Masonry after each image loads
+  msnry.layout();
+});
+    </script >
 </body>
 </html>

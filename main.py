@@ -12,28 +12,30 @@ import clip
 import pathlib
 import random
 import numpy as np
+import csv
 
 app = Flask(__name__)
 
 # get the targeted folder
 try:
-    img_folder = os.environ["FLASK_ARG"]
+    use_case = os.environ["FLASK_ARG"]
 except:
-    print("### FLASK_ARG env var is not defined, processing 'static' folder by default! ###")
-    img_folder = "static"
+    print("### FLASK_ARG env var is not defined! ###")
+    quit()
+
+img_folder = "static/"+use_case
 
 app.logger.info('...working on image folder: '+img_folder)
 
 app.logger.info('...loading the CLIP model')
 model, preprocess = clip.load("ViT-B/32")
 model.eval()
-
 input_resolution = model.visual.input_resolution
 context_length = model.context_length
 vocab_size = model.vocab_size
 
 # Tensor
-tensor_file = img_folder + "_torch.pt"
+tensor_file = use_case + "_torch.pt"
 if not os.path.exists(tensor_file):
     app.logger.info("### Torch tensor is missing: "+tensor_file)
     quit()
@@ -52,26 +54,36 @@ if not os.path.exists(directory_file):
 with open(directory_file) as f:
     image_paths = f.readlines()
 image_count = len(image_paths)
-app.logger.info("   number of images found:"+ str(image_count))
+app.logger.info("   number of images found: "+ str(image_count))
 
 # Directory summary
 directory_summary = img_folder+ "_directory.txt"
+if not os.path.exists(directory_summary):
+    app.logger.info("### directory summary does not exist: " + directory_summary)
+    quit()
 with open(directory_summary) as f:
     summary = f.read()
 
-# minimum probability for the results
-minProbCBIR = 0.97
-minProbClassif = 0.7
 # max number of displayed results
 maxResults= 100
 # max displayed thumbnails on the home page
-maxThumbnails = 400
+maxThumbnails = 200
 
 # predefined classes for the classification scenario
-labels=["photo", "map", "crossword", "drawing", "text", "handwritten"]
-classes=["a photo", "a map", "a crossword grid", "a drawing", "a printed text", "a handwritten text"]
+labels=[]
+captions=[]
+labels_file = img_folder+ "_labels.csv"
+if not os.path.exists(labels_file):
+    app.logger.info("### CSV labels file is missing: " + labels_file)
+    quit()
+with open(labels_file) as f:
+    label = csv.reader(f, delimiter=',')
+    for row in label:
+        labels.append(row[0])
+        captions.append(row[1])
+app.logger.info(labels)
 
-#############
+############# MAIN stuff ###############
 @app.route('/', methods=("POST", "GET"))
 def page():
     if request.method == "POST":
@@ -80,14 +92,15 @@ def page():
         clip.tokenize("Hello world!")
         preprocess
 
-        app.logger.info(f"\n-----------------\n threshold prob for CBIR: {minProbCBIR:.2f}")
-        app.logger.info(f"\n-----------------\n threshold prob for classification: {minProbClassif:.2f}")
-
         query = request.form["prompt"]
-        if query in labels:
-            ### Classification use case ###
-            text_descriptions = [f"{label}" for label in classes]
-            app.logger.info(text_descriptions)
+        if query in labels: ### Classification use case ###
+            minProb = 1.0/len(labels) # minProb should be > random guess
+            app.logger.info(f"\n-----------------\n threshold prob for classification: {minProb:.2f}")
+            label_index = labels.index(query) # the label's index of the targeted class
+            caption = captions[label_index] # the caption of the targeted class
+            app.logger.info("#################")
+            app.logger.info(caption)
+            text_descriptions = [f"{label}" for label in captions]
             text_tokens = clip.tokenize(text_descriptions)
             with torch.no_grad():
                 text_features = model.encode_text(text_tokens).float()
@@ -96,33 +109,38 @@ def page():
 
             # we're looking for the top #2 probs
             top_probs, top_labels = text_probs.cpu().topk(2, dim=-1)
-            app.logger.info(top_probs[:20])
-            app.logger.info(top_labels[:20])
-            app.logger.info(image_paths[:20])
+            app.logger.info("####### top probs for the top 2 classes [10] ##########")
+            app.logger.info(top_probs[:10])
+            app.logger.info(top_labels[:10])
+            #app.logger.info(image_paths[:20])
 
             nameImageTopProb = []
             prob = []
             tuples=[]
             # filtering the images on a probability threshold for the targeted class
             for i, image in enumerate(image_paths):
-                if (float(top_probs[i][0]) > minProbClassif and top_labels[i][0]==labels.index(query)):
+                if (top_labels[i][0]==label_index):
+                #if (float(top_probs[i][0]) > minProb and top_labels[i][0]==label_index):
                     tuples.append((image_paths[i],float(top_probs[i][0]),top_labels[i][1],float(top_probs[i][1])))
-            app.logger.info("  number of images validating the prob threshold: "+ str(len(tuples)))
+            app.logger.info("  number of images validating the query: "+ str(len(tuples)))
             # sorting the probs by decreasing values
             decreasing = sorted(tuples, key=lambda criteria: criteria[1], reverse=True)
             # build the arrays for the HTML rendition: maxResults first items
             nameImageTopProb = [i[0] for i in decreasing[:maxResults]]
+            app.logger.info("####### files for the result images ##########")
             app.logger.info(nameImageTopProb)
             prob1 = [i[1] for i in decreasing[:maxResults]]
             stringProb1 = ["%.3f" % number for number in prob1]
+            app.logger.info("####### top prob #1 for the targeted class ##########")
             app.logger.info(stringProb1)
             # the second best class
             prob2 = [i[3] for i in decreasing[:maxResults]]
             stringProb2 = ["%.3f" % number for number in prob2]
             class2 = [labels[i[2]] for i in decreasing[:maxResults]]
+            app.logger.info("####### top prob #2 for the result images ##########")
             app.logger.info(stringProb2)
             app.logger.info(class2)
-            return render_template("grid_classif.html", files=nameImageTopProb, prob1=stringProb1, targetClass=query, class2=class2, prob2=stringProb2, query=query, comment="("+str(len(tuples))+ " results > "+str(minProbClassif)+" probability, first "+str(maxResults)+" displayed)")
+            return render_template("grid_classif.html", files=nameImageTopProb, prob1=stringProb1, targetClass=query, class2=class2, prob2=stringProb2, query=query, caption=caption, comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
         else:
             ### Image retrieval use case ###
             #text_descriptions=["a photo of a blank page"]
@@ -136,7 +154,7 @@ def page():
                 text_features /= text_features.norm(dim=-1, keepdim=True)
 
             text_probs = (image_features @ text_features.T)
-            app.logger.info(text_probs)
+            #app.logger.info(text_probs)
 
             sorted_values, indices = torch.sort(text_probs, dim=0,descending=True)
             nameImageTopProb = [image_paths[i] for i in indices[:maxResults]]
@@ -158,6 +176,7 @@ def page():
             n+=1
             rdm = random.randint(0, r)
             if rdm == r:
+                filename = filename[:-1] # chop the last char = return
                 random_files.append(filename)
                 i+=1
             if i >= maxThumbnails:

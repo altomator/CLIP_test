@@ -7,6 +7,12 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit-icons.min.js"></script>
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    <style>
+#grid {
+   margin:15px;
+   z-index: 0;
+ }
+ </style>
 </head>
 <body>
   <p style="padding-top:10pt;padding-left:10pt;">Use a free query OR one of these predefined classes: {{classes}}</p>
@@ -16,12 +22,28 @@
         <button class="uk-button uk-button-default" type="submit">Submit</button>
     </form>
     <br>
-    <div class="grid" data-masonry='{ "itemSelector": ".grid-item"}'>
+    <div id="grid" data-masonry='{ "itemSelector": ".grid-item"}'>
         {% for image in files %}
-            <div class="grid-item"><img src="{{image}}" width="100" height="200"></div>
+            <div class="grid-item"><img src="{{image}}" width="150" ></div>
         {% endfor %}
     </div>
     <p style="padding-left:10pt;">{{count}} images</p>
     <pre><code style="font-size:6pt">{{summary}}</code></pre>
+
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
+    <script >
+    var grid = document.querySelector('#grid');
+
+    var msnry = new Masonry( grid, {
+  itemSelector: '.grid-item',
+  percentPosition: true
+});
+
+  imagesLoaded( grid ).on( 'progress', function() {
+  // layout Masonry after each image loads
+  msnry.layout();
+});
+
+    </script >
 </body>
 </html>
