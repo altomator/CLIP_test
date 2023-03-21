@@ -28,7 +28,7 @@ Note: The whole workflow can be run using the bash script ``run.sh``.
 
 The web app displays a random selection of images and a prompt field.
 
-
+![The web app](screen/home.png)
 
 ## Classification scenario
 
@@ -38,9 +38,14 @@ For this use case, we want to use CLIP as a zero-shot classifier. The images typ
 - "a crossword grid"
 ...
 
-The result list shows the most likely images for the requested class, the associated probability and the second most likely class.
+The results list shows the most likely images for the requested class, the associated probability and the second most likely class. In this example, we are looking for crossword grids in newspapers.
+
+![Classification](screen/classify.png)
 
 ## Information retrieval scenario
 
-In this scenario, a free request is inputed and the result list outputs the images ranked by probability.
+In this scenario, a free-form query is entered and the result list displays the images ranked in order of probability. In the example below, we are looking for cartoons of people in the street.
+
+![Classification](screen/CBIR.png)
+
 
