@@ -47,7 +47,8 @@ The results list shows the most likely images for the requested class, the proba
 ![Classification](screen/classify.png)
 
 ### Evaluation 
-If images are sorted into subfolders based on tag names, a confusion matrix will be calculated and displayed at the bottom of the results list.
+If images are sorted into subfolders based on class names, a confusion matrix will be calculated and displayed at the bottom of the results list.
+
 
 ## Information retrieval scenario
 
