@@ -1,0 +1,4 @@
+## Confusion Matrix calculation: something is wrong with the ground truth! ##
+- images must be stored in subfolders; 
+- subfolders must be named accordingly to labels; 
+- labels must be sorted in xxx_labels.csv 

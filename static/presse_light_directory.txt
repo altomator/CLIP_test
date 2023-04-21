@@ -1,0 +1,31 @@
+walk_dir = static/presse_light
+walk_dir (absolute) = /Users/bnf/Desktop/IA_DIVERS/CLIP/Démo/CLIP-model-website-main/static/presse_light
+--
+root = static/presse_light
+	- subdirectory Crossword
+	- subdirectory Drawing
+	- subdirectory Map
+	- subdirectory Photo
+	- subdirectory Text
+files: 0
+--
+root = static/presse_light/Crossword
+	-0 : 2-3-41.jpg (full path: static/presse_light/Crossword/2-3-41.jpg)
+files: 2
+--
+root = static/presse_light/Drawing
+	-0 : bpt6k4618395h-1-1.jpg (full path: static/presse_light/Drawing/bpt6k4618395h-1-1.jpg)
+files: 6
+--
+root = static/presse_light/Map
+	-0 : bpt6k4618456r-3-1.jpg (full path: static/presse_light/Map/bpt6k4618456r-3-1.jpg)
+files: 2
+--
+root = static/presse_light/Photo
+	-0 : 6-1-5.jpg (full path: static/presse_light/Photo/6-1-5.jpg)
+	-10 : 14-4-1.jpg (full path: static/presse_light/Photo/14-4-1.jpg)
+files: 12
+--
+root = static/presse_light/Text
+	-0 : bpt6k4618395h-1-5.jpg (full path: static/presse_light/Text/bpt6k4618395h-1-5.jpg)
+files: 3

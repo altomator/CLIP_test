@@ -16,8 +16,10 @@
 img {
   z-index: -2
 }
-p.query {
+p {
   padding: 10pt;
+}
+p.query {
   font-weight: bold
 }
 p.thumb {
@@ -55,6 +57,12 @@ div.bar {
             </div>
         {% endfor %}
     </div>
+    <p style="margin-bottom:-1em" class="query">Confusion matrix</p>
+    <object style="margin-left: 5px;width:800px;height:200px" data="{{confmatfile}}"> </object>
+    <p style="margin-bottom:-2em" class="query">Accuracy (mean): {{accuracy1}} %</p>
+    <p style="margin-bottom:-2em;margin-left:10.5em">{{labels}}</p>
+    <p class="query">Accuracy (per class): {{accuracy2}} %</p>
+
     <p class="query"><a href="{{url_for('page')}}">Back to main menu</a></p>
 
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>

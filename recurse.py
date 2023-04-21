@@ -30,14 +30,16 @@ list_file_path = os.path.join(list_dir, output_file)
 with open(list_file_path, 'wb') as list_file:
     for root, subdirs, files in os.walk(walk_dir):
         print('--\nroot = ' + root)
-
+        # we need to sort by alphabetical order to be consistent with the labels
+        # during the confusion matrix computation
+        subdirs.sort()
         for subdir in subdirs:
             print('\t- subdirectory ' + subdir)
-        i=1
+        i=0
         for filename in [filename for filename in files if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".JPG") or filename.endswith(".png")]:
             file_path = os.path.join(root, filename)
             if (i % 10 == 0):
                 print('\t-%s : %s (full path: %s)' % (str(i), filename, file_path))
             list_file.write(('%s\n' % (file_path)).encode('utf-8'))
             i+=1
-        print(i)
+        print("files: "  + str(i))
