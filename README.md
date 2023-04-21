@@ -18,6 +18,11 @@ Then the CLIP embeddings are computed with:
 ```
 The embeddings are saved in a Torch tensor named after the folder name (in our example, ``myImages_torch.pt``).
 
+Then create a env variable to inform the falsk app about your folder:
+```
+export FLASK_ARG="myImages"
+```
+
 Finally, launch the web app:
 ```
 >flask --app main.py --debug run
