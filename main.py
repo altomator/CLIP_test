@@ -155,12 +155,20 @@ def page():
             name_image_top_prob = []
             prob = []
             tuples=[]
+            FP=[]
             for i, image in enumerate(image_paths):
-                if (top_labels[i][0]==label_index):
+                if (top_labels[i][0]==label_index): # filtering the images which match the query
                 #filtering the images on a probability threshold for the targeted class
                 #if (float(top_probs[i][0]) > minProb and top_labels[i][0]==label_index):
-                    tuples.append((image_paths[i],float(top_probs[i][0]),top_labels[i][1],float(top_probs[i][1])))
+                    # do we have false positives?
+                    if query in image_paths[i]:
+                        css="green"
+                    else:
+                        css="crimson"
+                    tuples.append((image_paths[i],float(top_probs[i][0]),top_labels[i][1],float(top_probs[i][1]),css))
+
             app.logger.info("  number of images validating the query: "+ str(len(tuples)))
+            app.logger.info(FP)
             # sorting the probs by decreasing values
             decreasing = sorted(tuples, key=lambda criteria: criteria[1], reverse=True)
             # build the arrays for the HTML rendition: maxResults first items
@@ -169,8 +177,10 @@ def page():
             #app.logger.info(name_image_top_prob)
             prob1 = [i[1] for i in decreasing[:maxResults]]
             string_prob1 = ["%.2f" % number for number in prob1]
+            FP=[i[4] for i in decreasing[:maxResults]]
             app.logger.info("####### top prob #1 for the targeted class ##########")
             app.logger.info(string_prob1)
+
             # the second best class
             prob2 = [i[3] for i in decreasing[:maxResults]]
             string_prob2 = ["%.2f" % number for number in prob2]
@@ -210,7 +220,7 @@ def page():
                 acc_class  = [i * 100.0 for i in acc]
                 acc_class = ["%.2f" % number for number in acc_class]
                 string_acc = ' %  /  '.join(acc_class)
-                return render_template("grid_classif.html", files=name_image_top_prob, labels= ' / '.join(labels), prob1=string_prob1, targetClass=query, class2=class2, prob2=string_prob2, query=query, caption=caption, confmatfile=conf_mat_file, accuracy1=accuracy, accuracy2=string_acc, comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
+                return render_template("grid_classif.html", files=name_image_top_prob, labels= ' / '.join(labels), targetClass=query, caption=caption, prob1=string_prob1, fp=FP, class2=class2, prob2=string_prob2,  confmatfile=conf_mat_file, accuracy1=accuracy, accuracy2=string_acc, comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
         else:
             ### Image retrieval use case ###
             #text_descriptions=["a photo of a blank page"]

@@ -19,7 +19,7 @@ img {
 p {
   padding: 10pt;
 }
-p.query {
+p.bold {
   font-weight: bold
 }
 p.thumb {
@@ -31,13 +31,11 @@ p.thumb {
   padding: 0;
   font-weight: normal
 }
-p.bar {
-  margin-left: 5px;
-}
 div.bar {
   z-index: 1;
-  margin-top: -1.75em;
-  height: 1.5em;
+  margin-top: -1.7em;
+  height: 2em;
+  line-height: 2em;
   color: white;
   background-color: gray;
   padding: 0;
@@ -46,24 +44,24 @@ div.bar {
 }
 </style>
 <body>
-    <p class="query"><span style="font-weight: normal">Class:</span> {{query}} / {{caption}} — {{comment}}</p>
+    <p class="bold"><span style="font-weight: normal">Class:</span> {{targetClass}} / {{caption}} — {{comment}}</p>
     <div id="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 250 }'>
         {% for image in files %}
             <div class="grid-item">
               <img src="{{image}}" width="250" height="400" alt="">
               <p class="thumb">{{image|truncate(50)}} ({{loop.index}})</p>
-              <div class="bar"><p class="bar">{{targetClass}}: {{prob1[loop.index-1]}}</p></div>
-              <div class="bar" style="background-color: lightgray;margin-top:0em;"><p class="bar" style="background-color: lightgray">{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</p></div>
+              <div class="bar" style="background-color:{{fp[loop.index-1]}}">&nbsp;{{targetClass}}: {{prob1[loop.index-1]}}</div>
+              <div class="bar" style="background-color:silver; margin-top:0em;">&nbsp;{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</div>
             </div>
         {% endfor %}
     </div>
-    <p style="margin-bottom:-1em" class="query">Confusion matrix</p>
+    <p style="margin-bottom:-1em" class="bold">Confusion matrix</p>
     <object style="margin-left: 5px;width:800px;height:200px" data="{{confmatfile}}"> </object>
-    <p style="margin-bottom:-2em" class="query">Accuracy (mean): {{accuracy1}} %</p>
+    <p style="margin-bottom:-2em" class="bold">Accuracy (mean): {{accuracy1}} %</p>
     <p style="margin-bottom:-2em;margin-left:10.5em">{{labels}}</p>
-    <p class="query">Accuracy (per class): {{accuracy2}} %</p>
+    <p class="bold">Accuracy (per class): {{accuracy2}} %</p>
 
-    <p class="query"><a href="{{url_for('page')}}">Back to main menu</a></p>
+    <p class="bold"><a href="{{url_for('page')}}">Back to main menu</a></p>
 
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
     <script >
