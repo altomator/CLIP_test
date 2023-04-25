@@ -36,7 +36,7 @@ with open(list_file_path, 'wb') as list_file:
         for subdir in subdirs:
             print('\t- subdirectory ' + subdir)
         i=0
-        for filename in [filename for filename in files if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".JPG") or filename.endswith(".png")]:
+        for filename in [filename for filename in files if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".JPG") or filename.endswith(".JPEG") or filename.endswith(".png")]:
             file_path = os.path.join(root, filename)
             if (i % 10 == 0):
                 print('\t-%s : %s (full path: %s)' % (str(i), filename, file_path))

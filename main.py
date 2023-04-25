@@ -20,7 +20,7 @@ from torchmetrics.classification import MulticlassAccuracy
 app = Flask(__name__)
 
 # max number of displayed results
-maxResults= 100
+maxResults= 400
 # max displayed thumbnails on the home page
 maxThumbnails = 200
 
@@ -196,7 +196,7 @@ def page():
                 app.logger.info(conf_msg)
                 app.logger.info("images files: "+str(image_count))
                 app.logger.info("images in GT folders: "+str(examples_tot))
-                return render_template("grid_classif.html", files=name_image_top_prob, labels= ' / '.join(labels), prob1=string_prob1, targetClass=query, class2=class2, prob2=string_prob2, query=query, caption=caption, confmatfile="static/_confusion.txt", accuracy1="", accuracy2="", comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
+                return render_template("grid_classif.html", files=name_image_top_prob, labels= ' / '.join(labels), targetClass=query, caption=caption, prob1=string_prob1, fp=[], class2=class2, prob2=string_prob2, confmatfile="static/_confusion.txt", accuracy1="", accuracy2="", comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
             else:
                 app.logger.info("...computing the confusion matrix")
                 pred_classes_idx = torch.argmax(text_probs, dim=1)
