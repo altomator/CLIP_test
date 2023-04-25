@@ -18,6 +18,8 @@ Then the CLIP embeddings are computed with:
 ```
 The embeddings are saved in a Torch tensor named after the folder name (in our example, ``myImages_torch.pt``).
 
+*Note: join.py can be used to concatenate tensors if you need to process large volumes of images within memory constraint.*
+
 Then create an env variable to inform the flask app about your images folder:
 ```
 export FLASK_ARG="myImages"
@@ -39,20 +41,20 @@ The web app displays a random selection of images and a prompt field.
 
 For this use case, we want to use CLIP as a zero-shot classifier. The images types (classes) we want to classify are described in the ``static/myImages_labels.csv`` file as textual captions, e.g.:
 ```
-crossword,a crossword grid
-drawing,a drawing
-map,a map
-photo,a photo
+Crosswords,a crossword grid or a chess game or a word game printed in a heritage newspaper
+Drawing,a monochrome drawing printed in a heritage newspaper
+Map,a monochrome map printed in a heritage newspaper
+Photo,a black and white picture printed in a heritage newspaper
 ...
 ```
 These class names will be listed to the user on the home page and the model will output probabilities against these captions.
 
-The results list shows the most likely images for the requested class, the probability and the second most likely class. In this example, we are looking for crossword grids in newspapers.
+The results list shows the most likely images for the requested class, the probability and the second most likely class. In this example, we are looking for drawings in newspapers.
 
 ![Classification](screen/classify.png)
 
 ### Evaluation 
-If images are sorted into subfolders based on class names, a confusion matrix will be calculated and displayed at the bottom of the results list.
+If images are sorted into subfolders based on class names, a confusion matrix will be calculated and displayed after the results list.
 
 
 ## Information retrieval scenario
