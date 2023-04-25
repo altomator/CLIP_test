@@ -41,10 +41,10 @@ The web app displays a random selection of images and a prompt field.
 
 For this use case, we want to use CLIP as a zero-shot classifier. The images types (classes) we want to classify are described in the ``static/myImages_labels.csv`` file as textual captions, e.g.:
 ```
-crossword,a crossword grid
-drawing,a drawing
-map,a map
-photo,a photo
+Crosswords,a crossword grid or a chess game or a word game printed in a heritage newspaper
+Drawing,a monochrome drawing printed in a heritage newspaper
+Map,a monochrome map printed in a heritage newspaper
+Photo,a black and white picture printed in a heritage newspaper
 ...
 ```
 These class names will be listed to the user on the home page and the model will output probabilities against these captions.
