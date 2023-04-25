@@ -18,6 +18,8 @@ Then the CLIP embeddings are computed with:
 ```
 The embeddings are saved in a Torch tensor named after the folder name (in our example, ``myImages_torch.pt``).
 
+*Note: the join.py script can be used to concatenate tensors if you need to process large volumes of images within memory constraint.*
+
 Then create an env variable to inform the flask app about your images folder:
 ```
 export FLASK_ARG="myImages"
