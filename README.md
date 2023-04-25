@@ -49,12 +49,12 @@ Photo,a black and white picture printed in a heritage newspaper
 ```
 These class names will be listed to the user on the home page and the model will output probabilities against these captions.
 
-The results list shows the most likely images for the requested class, the probability and the second most likely class. In this example, we are looking for crossword grids in newspapers.
+The results list shows the most likely images for the requested class, the probability and the second most likely class. In this example, we are looking for drawings in newspapers.
 
 ![Classification](screen/classify.png)
 
 ### Evaluation 
-If images are sorted into subfolders based on class names, a confusion matrix will be calculated and displayed at the bottom of the results list.
+If images are sorted into subfolders based on class names, a confusion matrix will be calculated and displayed after the results list.
 
 
 ## Information retrieval scenario
