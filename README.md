@@ -34,6 +34,7 @@ and open this URL http://127.0.0.1:5000 in your browser.
 *Note: the whole workflow can be ran using the bash script ``run.sh``.*
 
 The web app displays a random selection of images and a prompt field.
+(If the file ``static/myImages_urls.txt`` exists, images are linked to their URL.)
 
 ![The web app](screen/home.png)
 
