@@ -41,8 +41,11 @@ print("   Torch version:", torch.__version__)
 
 clip.available_models()
 
-model, preprocess = clip.load("ViT-B/32")
-model.eval()
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+model, preprocess = clip.load("ViT-B/32",device=device)
+model.to(device).eval()
+
 input_resolution = model.visual.input_resolution
 context_length = model.context_length
 vocab_size = model.vocab_size
@@ -57,7 +60,7 @@ print("   vocab size:", vocab_size)
 preprocess
 
 # text preprocessing
-clip.tokenize("Hello world!")
+clip.tokenize("Hello world!").to(device)
 
 images = []
 i = 0
@@ -69,11 +72,14 @@ for filename in image_paths:
     if (i % 10 == 0):
         print(i, " : ", filename)
     image = Image.open(filename).convert("RGB")
+    #image = preprocess(Image.open(filename).convert("RGB")).unsqueeze(0).to(device)
     images.append(preprocess(image))
+    #images.append(image)
     i += 1
 
-print ("...buiding the torch tensor")
-image_input = torch.tensor(np.stack(images))
+print ("...building the torch tensor")
+image_input = torch.tensor(np.stack(images)).to(device)
+
 
 print ("...now generating the image features")
 with torch.no_grad():

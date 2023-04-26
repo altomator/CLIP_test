@@ -17,7 +17,7 @@ p.thumb {
   margin-top: -1.5em;
   margin-left: 5px;
   margin-bottom: 0;
-  font-size: 0.6em;
+  font-size: 0.45em;
   color: red;
   padding: 0pt;
   font-weight: normal;
@@ -33,10 +33,17 @@ p.query {
         {% set e = 0 %}
         {% for image in files %}
             <div class="grid-item">
+              {% if urls[loop.index-1][:-1] == "-" %}
               <img src="{{image}}" width="250" height="400" alt="image">
-              <p class="thumb">{{image}} ({{prob[loop.index-1]}})</p></div>
+              {% else %}
+              <a href="{{urls[loop.index-1][:-1]}}" target="_blank">
+                <img src="{{image}}" width="250" height="400" alt="image">
+              </a>
+              {% endif %}
+              <p class="thumb">{{image|replace("static/","")}} ({{prob[loop.index-1]}})</p></div>
         {% endfor %}
     </div>
+
     <p class="query"><a href="{{url_for('page')}}">Back to home page</a></p>
 
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>

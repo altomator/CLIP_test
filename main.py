@@ -1,9 +1,8 @@
 # > flask --app main.py --debug run
 # puis http://127.0.0.1:5000
 
-import logging
+#import logging
 from flask import Flask, redirect, request, url_for, render_template
-#import click
 from PIL import Image
 from tqdm import tqdm
 import torch
@@ -73,6 +72,18 @@ if not os.path.exists(directory_summary):
 with open(directory_summary) as f:
     summary = f.read()
 
+# URLs
+image_urls = img_folder+ "_urls.txt"
+if not os.path.exists(image_urls):
+    app.logger.info("### URLs list does not exist: " + image_urls)
+else:
+    app.logger.info('...reading the URLs list')
+    with open(image_urls) as f:
+        urls = f.readlines()
+    #app.logger.info(urls)
+    urls_count = len(urls)
+    app.logger.info("   number of URLs found: "+ str(urls_count))
+
 # Reading the predefined classes for the classification scenario
 labels=[]
 captions=[]
@@ -129,7 +140,8 @@ def page():
         preprocess
 
         query = request.form["prompt"]
-        if query in labels: ### Classification use case ###
+        ### Classification use case ###
+        if query in labels:
             #minProb = 1.0/classes_nbr # minProb should be > random guess
             #app.logger.info(f"\n-----------------\n threshold prob for classification: {minProb:.2f}")
             label_index = labels.index(query) # the label's index of the targeted class
@@ -165,7 +177,7 @@ def page():
                         css="green"
                     else:
                         css="crimson"
-                    tuples.append((image_paths[i],float(top_probs[i][0]),top_labels[i][1],float(top_probs[i][1]),css))
+                    tuples.append((image_paths[i],float(top_probs[i][0]),top_labels[i][1],float(top_probs[i][1]),css,urls[i]))
 
             app.logger.info("  number of images validating the query: "+ str(len(tuples)))
             app.logger.info(FP)
@@ -173,11 +185,12 @@ def page():
             decreasing = sorted(tuples, key=lambda criteria: criteria[1], reverse=True)
             # build the arrays for the HTML rendition: maxResults first items
             name_image_top_prob = [i[0] for i in decreasing[:maxResults]]
+            FP=[i[4] for i in decreasing[:maxResults]]
+            urls_top_prob = [i[5] for i in decreasing[:maxResults]]
             #app.logger.info("####### files for the result images ##########")
             #app.logger.info(name_image_top_prob)
             prob1 = [i[1] for i in decreasing[:maxResults]]
             string_prob1 = ["%.2f" % number for number in prob1]
-            FP=[i[4] for i in decreasing[:maxResults]]
             app.logger.info("####### top prob #1 for the targeted class ##########")
             app.logger.info(string_prob1)
 
@@ -196,7 +209,7 @@ def page():
                 app.logger.info(conf_msg)
                 app.logger.info("images files: "+str(image_count))
                 app.logger.info("images in GT folders: "+str(examples_tot))
-                return render_template("grid_classif.html", files=name_image_top_prob, labels= ' / '.join(labels), targetClass=query, caption=caption, prob1=string_prob1, fp=[], class2=class2, prob2=string_prob2, confmatfile="static/_confusion.txt", accuracy1="", accuracy2="", comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
+                return render_template("grid_classif.html", files=name_image_top_prob, urls=urls_top_prob, labels= ' / '.join(labels), targetClass=query, caption=caption, prob1=string_prob1, fp=[], class2=class2, prob2=string_prob2, confmatfile="static/_confusion.txt", accuracy1="", accuracy2="", comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
             else:
                 app.logger.info("...computing the confusion matrix")
                 pred_classes_idx = torch.argmax(text_probs, dim=1)
@@ -220,10 +233,9 @@ def page():
                 acc_class  = [i * 100.0 for i in acc]
                 acc_class = ["%.2f" % number for number in acc_class]
                 string_acc = ' %  /  '.join(acc_class)
-                return render_template("grid_classif.html", files=name_image_top_prob, labels= ' / '.join(labels), targetClass=query, caption=caption, prob1=string_prob1, fp=FP, class2=class2, prob2=string_prob2,  confmatfile=conf_mat_file, accuracy1=accuracy, accuracy2=string_acc, comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
+                return render_template("grid_classif.html", files=name_image_top_prob, urls=urls_top_prob, labels= ' / '.join(labels), nlabels=classes_nbr, target_class=query, caption=caption, prob1=string_prob1, fp=FP, class2=class2, prob2=string_prob2,  confmatfile=conf_mat_file, accuracy1=accuracy, accuracy2=string_acc, comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
         else:
             ### Image retrieval use case ###
-            #text_descriptions=["a photo of a blank page"]
             text_descriptions=[]
             query = request.form["prompt"]
             text_descriptions.append(f""+query)
@@ -234,13 +246,13 @@ def page():
                 text_features /= text_features.norm(dim=-1, keepdim=True)
             text_probs = (image_features @ text_features.T)
             #app.logger.info(text_probs)
-
             sorted_values, indices = torch.sort(text_probs, dim=0,descending=True)
             name_image_top_prob = [image_paths[i] for i in indices[:maxResults]]
+            urls_top_prob = [urls[i] for i in indices[:maxResults]]
             #app.logger.info(name_image_top_prob)
             prob = sorted_values[:maxResults]
             stringProb = ["%.3f" % number for number in prob]
-            return render_template("grid_cbir.html", files=name_image_top_prob, prob=stringProb, query=query, comment="(first "+str(maxResults)+" results displayed)")
+            return render_template("grid_cbir.html", files=name_image_top_prob, urls=urls_top_prob, prob=stringProb, query=query, use_case=use_case, comment="(first "+str(maxResults)+" results displayed)")
     else:
         # Building the home page: images mosaic
         app.logger.info('...Starting to populate the image grid')
@@ -263,6 +275,6 @@ def page():
         app.logger.info(f"   files: {n}")
         app.logger.info(labels)
         if not labels:
-            return render_template("home.html", files=random_files, msg='Use a free query:', classes='', count=image_count, summary=summary)
+            return render_template("home.html", files=random_files, urls=urls, msg='Use a free query:', classes='', count=image_count, summary=summary)
         else:
-            return render_template("home.html", files=random_files, msg='Use a free query OR one of these predefined classes: ', classes=', '.join(labels), count=image_count, summary=summary)
+            return render_template("home.html", files=random_files, urls=urls, msg='Use a free query OR one of these predefined classes: ', classes=', '.join(labels), count=image_count, summary=summary)

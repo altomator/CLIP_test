@@ -24,7 +24,15 @@
     <br>
     <div id="grid" data-masonry='{ "itemSelector": ".grid-item"}'>
         {% for image in files %}
-            <div class="grid-item"><img src="{{image}}" width="150" ></div>
+            <div class="grid-item">
+                {% if urls[loop.index-1][:-1] == "-" %}
+                <img src="{{image}}" width="150">
+                {% else %}
+                <a href="{{urls[loop.index-1][:-1]}}" target="_blank">
+                  <img src="{{image}}" width="150">
+                </a>
+                {% endif %}
+            </div>
         {% endfor %}
     </div>
     <p style="padding-left:10pt;">{{count}} images</p>

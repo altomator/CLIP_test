@@ -11,7 +11,10 @@
 <style>
 #grid {
    margin:15px;
-   z-index: -1
+   z-index: 0
+ }
+ a {
+   z-index: 2
  }
 img {
   z-index: -2
@@ -25,7 +28,7 @@ p.bold {
 p.thumb {
   margin-top: -1.5em;
   margin-left: 5px;
-  font-size: 0.5em;
+  font-size: 0.45em;
   height: 1em;
   color: red;
   padding: 0;
@@ -44,21 +47,27 @@ div.bar {
 }
 </style>
 <body>
-    <p class="bold"><span style="font-weight: normal">Class:</span> {{targetClass}} / {{caption}} — {{comment}}</p>
+    <p class="bold"><span style="font-weight: normal">Class:</span> {{target_class}} / {{caption}} — {{comment}}</p>
     <div id="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 250 }'>
-        {% for image in files %}
+        {% for image in files %}  <!-- Jinja syntax -->
             <div class="grid-item">
-              <img src="{{image}}" width="250" height="400" alt="">
-              <p class="thumb">{{image|truncate(50)}} ({{loop.index}})</p>
-              <div class="bar" style="background-color:{{fp[loop.index-1]}}">&nbsp;{{targetClass}}: {{prob1[loop.index-1]}}</div>
+              {% if urls[loop.index-1][:-1] == "-" %}
+                <img src="{{image}}" width="250" height="400" alt="">
+              {% else %}
+              <a href="{{urls[loop.index-1][:-1]}}" target="_blank">
+                <img src="{{image}}" width="250" height="400" alt="">
+              </a>
+              {% endif %}
+              <p class="thumb">{{image|replace("static/","")}} ({{loop.index}})</p>
+              <div class="bar" style="background-color:{{fp[loop.index-1]}}">&nbsp;{{target_class}}: {{prob1[loop.index-1]}}</div>
               <div class="bar" style="background-color:silver; margin-top:0em;">&nbsp;{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</div>
             </div>
         {% endfor %}
     </div>
     <p style="margin-bottom:-1em" class="bold">Confusion matrix</p>
-    <object style="margin-left: 5px;width:800px;height:200px" data="{{confmatfile}}"> </object>
+    <object style="margin-left: 5px;width:800px;height:{{nlabels * 1.1+2}}em" data="{{confmatfile}}"> </object>
     <p style="margin-bottom:-2em" class="bold">Accuracy (mean): {{accuracy1}} %</p>
-    <p style="margin-bottom:-2em;margin-left:10.5em">{{labels}}</p>
+    <p style="margin-bottom:-2.5em;margin-left:10.5em">{{labels}}</p>
     <p class="bold">Accuracy (per class): {{accuracy2}} %</p>
 
     <p class="bold"><a href="{{url_for('page')}}">Back to main menu</a></p>
