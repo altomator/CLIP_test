@@ -18,7 +18,7 @@ Then the CLIP embeddings are computed with:
 ```
 The embeddings are saved in a Torch tensor named after the folder name (in our example, ``myImages_torch.pt``).
 
-*Note: join.py can be used to concatenate tensors if you need to process large volumes of images within memory constraint.*
+*Note: ``join.py`` can be used to concatenate tensors if you need to process large volumes of images within memory constraint.*
 
 Then create an env variable to inform the flask app about your images folder:
 ```
@@ -31,7 +31,7 @@ Finally, launch the web app:
 ```
 and open this URL http://127.0.0.1:5000 in your browser.
 
-Note: the whole workflow can be ran using the bash script ``run.sh``.
+*Note: the whole workflow can be ran using the bash script ``run.sh``.*
 
 The web app displays a random selection of images and a prompt field.
 
