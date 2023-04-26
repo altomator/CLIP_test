@@ -12,7 +12,7 @@ First, launch:
 ```
 if you want to process a folder of images named ``myImages`` (subfolders may be used within this folder) stored in the ``static`` application folder. It will generate the directory files list and a report (as both text files).
 
-Then the CLIP embeddings are computed with:
+Then the CLIP embeddings are computed (CUDA or CPU processing is supported) with:
 ```
 >python3 model.py -f myImages
 ```
