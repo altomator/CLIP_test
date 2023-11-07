@@ -12,7 +12,7 @@ First, launch:
 ```
 if you want to process a folder of images named ``myImages`` (subfolders may be used within this folder) stored in the ``static`` application folder. It will generate the directory files list and a report (as both text files).
 
-Then the CLIP embeddings are computed with:
+Then the CLIP embeddings are computed (CUDA or CPU processing is supported) with:
 ```
 >python3 model.py -f myImages
 ```
@@ -36,6 +36,8 @@ and open this URL http://127.0.0.1:5000 in your browser.
 The web app displays a random selection of images and a prompt field.
 
 ![The web app](screen/home.png)
+
+If the file ``static/myImages_urls.txt`` exists, images are linked to their URL. Images with no URL can be mixed (using the character - as URL).
 
 ## Classification scenario
 
