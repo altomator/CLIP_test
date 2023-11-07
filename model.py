@@ -11,6 +11,9 @@ import clip # python3 -m pip install clip git+https://github.com/openai/CLIP.git
 import pathlib
 import argparse
 
+# folder where the tensors are
+torchFolder = "torch/"
+
 ###
 parser = argparse.ArgumentParser(
                     prog = 'model.py',
@@ -39,7 +42,7 @@ print("   number of images found:", image_count)
 print("...loading the CLIP model")
 print("   Torch version:", torch.__version__)
 
-clip.available_models()
+print(clip.available_models())
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -87,7 +90,7 @@ with torch.no_grad():
     image_features /= image_features.norm(dim=-1, keepdim=True)
 
 #
-output = args.f +  "_torch.pt"
+output = torchFolder + args.f +  "_torch.pt"
 
 print ("--> embeddings saved in %s\n" % output)
 torch.save(image_features, output)

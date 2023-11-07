@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>CLIP testing</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/css/uikit.min.css" />
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/css/uikit.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit-icons.min.js"></script>
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    -->
+    <script src="static/masonry.pkgd.js"></script>
     <style>
 #grid {
    margin:15px;
@@ -17,7 +19,7 @@
 <body>
   <p style="padding-top:10pt;padding-left:10pt;">{{msg}} {{classes}}</p>
     <form action="{{url_for('page')}}" method="post" style="width: 600px;padding-left:10pt;">
-        <input class="uk-input" type="text" name="prompt" placeholder="Prompt" id="prompt">
+        <input class="uk-input" style="width: 400px; type="text" name="prompt" placeholder="Prompt" id="prompt">
 
         <button class="uk-button uk-button-default" type="submit">Submit</button>
     </form>
@@ -25,7 +27,7 @@
     <div id="grid" data-masonry='{ "itemSelector": ".grid-item"}'>
         {% for image in files %}
             <div class="grid-item">
-                {% if urls[loop.index-1][:-1] == "-" %}
+                {% if not(urls|length) or urls[loop.index-1][:-1] == "-" %}
                 <img src="{{image}}" width="150">
                 {% else %}
                 <a href="{{urls[loop.index-1][:-1]}}" target="_blank">
@@ -38,7 +40,10 @@
     <p style="padding-left:10pt;">{{count}} images</p>
     <pre><code style="font-size:6pt">{{summary}}</code></pre>
 
+    <!--
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
+  -->
+    <script src="static/imagesloaded.pkgd.js"></script>
     <script >
     var grid = document.querySelector('#grid');
 

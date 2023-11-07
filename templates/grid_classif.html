@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Results for CLIP request</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/css/uikit.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit-icons.min.js"></script>
-    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+
+    <script src="static/masonry.pkgd.js"></script>
 </head>
 <style>
 #grid {
@@ -28,22 +26,24 @@ p.bold {
 p.thumb {
   margin-top: -1.5em;
   margin-left: 5px;
-  font-size: 0.45em;
+  font-size: 0.65em;
   height: 1em;
   color: red;
   padding: 0;
-  font-weight: normal
+  font-weight: normal;
+  font-family: sans-serif;
 }
 div.bar {
   z-index: 1;
-  margin-top: -1.7em;
+  margin-top: -1.5em;
   height: 2em;
   line-height: 2em;
   color: white;
   background-color: gray;
   padding: 0;
   font-size: 0.6em;
-  font-weight: normal
+  font-weight: normal;
+  font-family: sans-serif;
 }
 </style>
 <body>
@@ -51,31 +51,27 @@ div.bar {
     <div id="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 250 }'>
         {% for image in files %}  <!-- Jinja syntax -->
             <div class="grid-item">
-              {% if urls[loop.index-1][:-1] == "-" %}
-                <img src="{{image}}" width="250" height="400" alt="">
+              {% if not(urls|length) or urls[loop.index-1][:-1] == "-" %}
+                <img src="{{image}}" width="250"  alt="">
               {% else %}
               <a href="{{urls[loop.index-1][:-1]}}" target="_blank">
-                <img src="{{image}}" width="250" height="400" alt="">
+                <img src="{{image}}" width="250"  alt="">
               </a>
               {% endif %}
-              <p class="thumb">{{image|replace("static/","")}} ({{loop.index}})</p>
-              <div class="bar" style="background-color:{{fp[loop.index-1]}}">&nbsp;{{target_class}}: {{prob1[loop.index-1]}}</div>
-              <div class="bar" style="background-color:silver; margin-top:0em;">&nbsp;{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</div>
+              <p class="thumb">{{image|replace(use_case,"")|replace("static//","")|truncate(52)}} ({{loop.index}})</p>
+              <div class="bar" style="background-color:{{fp1[loop.index-1]}}">&nbsp;{{class1[loop.index-1]}}: {{prob1[loop.index-1]}}</div>
+              <div class="bar" style="background-color:{{fp2[loop.index-1]}};margin-top:0em;">&nbsp;{{class2[loop.index-1]}}: {{prob2[loop.index-1]}}</div>
             </div>
         {% endfor %}
     </div>
     <p style="margin-bottom:-1em" class="bold">Confusion matrix</p>
-    <object style="margin-left: 5px;width:800px;height:{{nlabels * 1.1+2}}em" data="{{confmatfile}}"> </object>
-    <p style="margin-bottom:-2em" class="bold">Accuracy (mean): {{accuracy1}} %</p>
-    <p style="margin-bottom:-2.5em;margin-left:10.5em">{{labels}}</p>
-    <p class="bold">Accuracy (per class): {{accuracy2}} %</p>
+    <object style="margin-left: 5px;width:900px;height:{{nlabels * 1.2+7}}em" data="{{confmatfile}}"> </object>
 
     <p class="bold"><a href="{{url_for('page')}}">Back to main menu</a></p>
 
-    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
-    <script >
+    <script src="static/imagesloaded.pkgd.js"></script>
+    <script>
     var grid = document.querySelector('#grid');
-
     var msnry = new Masonry( grid, {
   itemSelector: '.grid-item',
   percentPosition: true

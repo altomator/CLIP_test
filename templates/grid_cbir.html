@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Results for CLIP request</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/css/uikit.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.15.18/dist/js/uikit-icons.min.js"></script>
-    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+
+    <script src="static/masonry.pkgd.js"></script>
 </head>
 <style>
 #grid {
@@ -33,20 +31,20 @@ p.query {
         {% set e = 0 %}
         {% for image in files %}
             <div class="grid-item">
-              {% if urls[loop.index-1][:-1] == "-" %}
-              <img src="{{image}}" width="250" height="400" alt="image">
+              {% if not(urls|length) or urls[loop.index-1][:-1] == "-" %}
+              <img src="{{image}}" width="250"  alt="image">
               {% else %}
               <a href="{{urls[loop.index-1][:-1]}}" target="_blank">
-                <img src="{{image}}" width="250" height="400" alt="image">
+                <img src="{{image}}" width="250"  alt="image">
               </a>
               {% endif %}
-              <p class="thumb">{{image|replace("static/","")}} ({{prob[loop.index-1]}})</p></div>
+              <p class="thumb">{{image|replace(use_case,"")|replace("static//","")|truncate(52)}} ({{prob[loop.index-1]}})</p></div>
         {% endfor %}
     </div>
 
     <p class="query"><a href="{{url_for('page')}}">Back to home page</a></p>
 
-    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
+    <script src="static/imagesloaded.pkgd.js"></script>
     <script >
     var grid = document.querySelector('#grid');
 

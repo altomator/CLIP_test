@@ -15,13 +15,19 @@ import csv
 #from sklearn.metrics import confusion_matrix
 from torchmetrics.classification import MulticlassConfusionMatrix
 from torchmetrics.classification import MulticlassAccuracy
+from torchmetrics.classification import MulticlassRecall
 
 app = Flask(__name__)
 
 # max number of displayed results
-maxResults= 400
+maxResults= 300
 # max displayed thumbnails on the home page
-maxThumbnails = 200
+maxThumbnails = 150
+# folder where the tensors are
+torchFolder = "torch/"
+# thresholds
+minProb=0.6
+gap=0.8 # between top 1 and top 2 for top2 inferences
 
 # get the targeted folder
 try:
@@ -30,11 +36,16 @@ except:
     print("### FLASK_ARG env var is not defined! ###")
     quit()
 
+# app folders
 img_folder = "static/"+use_case
+eval_folder = "static/_eval/"
+conf_mat_file = eval_folder+use_case+"_confusion.txt"
 
 app.logger.info('...working on image folder: '+img_folder)
 
 app.logger.info('...loading the CLIP model')
+print(clip.available_models())
+
 model, preprocess = clip.load("ViT-B/32")
 model.eval()
 input_resolution = model.visual.input_resolution
@@ -42,12 +53,13 @@ context_length = model.context_length
 vocab_size = model.vocab_size
 
 # Tensor
-tensor_file = use_case + "_torch.pt"
+tensor_file = torchFolder + use_case + "_torch.pt"
 if not os.path.exists(tensor_file):
     app.logger.info("### Torch tensor is missing: "+tensor_file)
     quit()
 app.logger.info("...loading the embeddings from: "+tensor_file)
-image_features = torch.load(tensor_file)
+image_features = torch.load(tensor_file, map_location=torch.device('cpu'))
+app.logger.info(image_features.size())
 
 # Image files
 if not os.path.exists(img_folder):
@@ -62,7 +74,10 @@ with open(directory_file) as f:
     image_paths = f.readlines()
 image_count = len(image_paths)
 app.logger.info("   number of images found: "+ str(image_count))
-#app.logger.info(image_paths)
+
+if image_count != image_features.size()[0]:
+    app.logger.info("### Tensor size and images number are different!")
+    quit()
 
 # Directory summary
 directory_summary = img_folder+ "_directory.txt"
@@ -73,6 +88,7 @@ with open(directory_summary) as f:
     summary = f.read()
 
 # URLs
+urls=[]
 image_urls = img_folder+ "_urls.txt"
 if not os.path.exists(image_urls):
     app.logger.info("### URLs list does not exist: " + image_urls)
@@ -102,7 +118,7 @@ else:
             labels.append(row[0])
             captions.append(row[1])
             # we look how many annotated images we have in the subfolder named according to the label
-            examples = paths.count(img_folder+"/"+row[0])
+            examples = paths.count(use_case+"/"+row[0])
             examples_tot += examples
             app.logger.info(" -examples for class "+row[0]+": "+str(examples))
             # we build the array of GT
@@ -111,14 +127,13 @@ else:
     classes_nbr=len(labels)
     app.logger.info("   number of images in subfolders: "+ str(examples_tot))
     #app.logger.info(gt_classes_idx)
-    conf_mat_file = img_folder+ "_confusion.txt"
 
 def chop(str):
     return str[:5]
 
-def writeConfMat(tensor):
-    app.logger.info("writing in : "+conf_mat_file)
-    with open(conf_mat_file, 'wb') as conf_file:
+def writeConfMat(tensor, filename, accuracy1, accuracy2):
+    app.logger.info("writing in : "+filename)
+    with open(filename, 'wb') as conf_file:
         labs = '\t'.join(map(chop,labels))
         app.logger.info(labs)
         conf_file.write('GT\\pred '.encode('utf-8')+labs.encode('utf-8'))
@@ -129,6 +144,44 @@ def writeConfMat(tensor):
             values = '\t'.join(map(str,l))
             app.logger.info(values)
             conf_file.write(chop(labels[i]).encode('utf-8')+'\t'.encode('utf-8')+values.encode('utf-8'))
+        conf_file.write("\n\n".encode('utf-8'))
+        conf_file.write("Accuracy (micro average): ".encode('utf-8')+ accuracy1.encode('utf-8'))
+        conf_file.write("\n".encode('utf-8'))
+        conf_file.write("Accuracy (per classe): \n".encode('utf-8'))
+        heading= ' / '.join(labels)
+        conf_file.write(heading.encode('utf-8'))
+        conf_file.write("\n".encode('utf-8'))
+        conf_file.write(accuracy2.encode('utf-8'))
+
+def writeTensor(tensor, filename):
+    if os.path.exists(filename):
+        app.logger.info(filename+" already exists!")
+        return
+    #app.logger.info(tensor)
+    app.logger.info("writing in : "+filename)
+    with open(filename, 'wb') as conf_file:
+        for i, x in enumerate(tensor.numpy()):
+            l = x.tolist()
+            if type(l) is list:
+                values = ';'.join(map(str,l))
+            else:
+                values = str(l)
+            #app.logger.info(values)
+            conf_file.write(values.encode('utf-8'))
+            conf_file.write("\n".encode('utf-8'))
+
+def writeList(a_list, filename):
+    if os.path.exists(filename):
+        app.logger.info(filename+" already exists!")
+        return
+    #app.logger.info(a_list)
+    app.logger.info("writing in : "+filename)
+    with open(filename, 'wb') as conf_file:
+        for x in a_list:
+            value = str(x)
+            #app.logger.info(values)
+            conf_file.write(value.encode('utf-8'))
+            conf_file.write("\n".encode('utf-8'))
 
 ############# MAIN stuff ###############
 @app.route('/', methods=("POST", "GET"))
@@ -140,6 +193,7 @@ def page():
         preprocess
 
         query = request.form["prompt"]
+
         ### Classification use case ###
         if query in labels:
             #minProb = 1.0/classes_nbr # minProb should be > random guess
@@ -159,57 +213,79 @@ def page():
 
             # we're looking for the top #2 probs
             top_probs, top_labels = text_probs.cpu().topk(2, dim=-1)
-            app.logger.info("####### top probs for the top 2 classes [10 first images] ##########")
+            writeTensor(top_probs, eval_folder+use_case+"_probs2.txt")
+            app.logger.info("####### top probs for the top-2 classes [10 first images] ##########")
             app.logger.info(top_probs[:10])
+            app.logger.info("####### label index for the top-2 classes")
             app.logger.info(top_labels[:10])
             #app.logger.info(image_paths[:20])
 
             name_image_top_prob = []
+            urls_top_prob = []
             prob = []
             tuples=[]
-            FP=[]
             for i, image in enumerate(image_paths):
-                if (top_labels[i][0]==label_index): # filtering the images which match the query
+                # filtering the images which match the query
+                # top 1 prob or top 2 prob criteria
+                if ((top_labels[i][0]==label_index) or (top_labels[i][1]==label_index and top_probs[i][1]/top_probs[i][0] > gap)):
+                # top 1 prob only
+                #if (top_labels[i][0]==label_index) :
                 #filtering the images on a probability threshold for the targeted class
                 #if (float(top_probs[i][0]) > minProb and top_labels[i][0]==label_index):
                     # do we have false positives?
                     if query in image_paths[i]:
-                        css="green"
+                        if (top_labels[i][0]==label_index):
+                            css1="green"
+                            css2="silver"
+                        else:
+                            css1="silver"
+                            css2="green"
                     else:
-                        css="crimson"
-                    tuples.append((image_paths[i],float(top_probs[i][0]),top_labels[i][1],float(top_probs[i][1]),css,urls[i]))
+                        css1="crimson"
+                        css2="crimson"
+                    tuples.append((image_paths[i],top_labels[i][0],float(top_probs[i][0]),top_labels[i][1],float(top_probs[i][1]),css1,css2,i))
 
             app.logger.info("  number of images validating the query: "+ str(len(tuples)))
-            app.logger.info(FP)
+
             # sorting the probs by decreasing values
-            decreasing = sorted(tuples, key=lambda criteria: criteria[1], reverse=True)
+            decreasing = sorted(tuples, key=lambda criteria: criteria[2], reverse=True)
             # build the arrays for the HTML rendition: maxResults first items
             name_image_top_prob = [i[0] for i in decreasing[:maxResults]]
-            FP=[i[4] for i in decreasing[:maxResults]]
-            urls_top_prob = [i[5] for i in decreasing[:maxResults]]
-            #app.logger.info("####### files for the result images ##########")
-            #app.logger.info(name_image_top_prob)
-            prob1 = [i[1] for i in decreasing[:maxResults]]
+            FP1=[i[5] for i in decreasing[:maxResults]]
+            FP2=[i[6] for i in decreasing[:maxResults]]
+            if len(urls) != 0:
+                urls_top_prob = [i[7] for i in decreasing[:maxResults]]
+            app.logger.info("####### files for the result images ##########")
+            app.logger.info(name_image_top_prob[0:10])
+            prob1 = [i[2] for i in decreasing[:maxResults]]
             string_prob1 = ["%.2f" % number for number in prob1]
-            app.logger.info("####### top prob #1 for the targeted class ##########")
-            app.logger.info(string_prob1)
+            class1 = [labels[i[1]] for i in decreasing[:maxResults]]
+            app.logger.info("####### top prob #1 for the result images ##########")
+            app.logger.info(string_prob1[0:10])
+            app.logger.info("####### class of the top prob #1 ##########")
+            app.logger.info(class1[0:10])
 
             # the second best class
-            prob2 = [i[3] for i in decreasing[:maxResults]]
+            prob2 = [i[4] for i in decreasing[:maxResults]]
             string_prob2 = ["%.2f" % number for number in prob2]
-            class2 = [labels[i[2]] for i in decreasing[:maxResults]]
+            class2 = [labels[i[3]] for i in decreasing[:maxResults]]
             app.logger.info("####### top prob #2 for the result images ##########")
-            app.logger.info(string_prob2)
-            app.logger.info(class2)
+            app.logger.info(string_prob2[0:10])
+            app.logger.info("####### class of the top prob #2 ##########")
+            app.logger.info(class2[0:10])
 
             # computing the confusion matrix
             # https://torchmetrics.readthedocs.io/en/stable/classification/confusion_matrix.html
-            if image_count != examples_tot:
+            if os.path.exists(conf_mat_file):
+                app.logger.info(conf_mat_file+" already exists!")
+                confmatfile=conf_mat_file
+            elif image_count != examples_tot:
                 conf_msg="## Confusion Matrix calculation: something is wrong with the ground truth!\n(images must be stored in subfolders; subfolders must be named accordingly to labels; labels must be sorted) ##"
                 app.logger.info(conf_msg)
                 app.logger.info("images files: "+str(image_count))
                 app.logger.info("images in GT folders: "+str(examples_tot))
-                return render_template("grid_classif.html", files=name_image_top_prob, urls=urls_top_prob, labels= ' / '.join(labels), targetClass=query, caption=caption, prob1=string_prob1, fp=[], class2=class2, prob2=string_prob2, confmatfile="static/_confusion.txt", accuracy1="", accuracy2="", comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
+                confmatfile="static/_eval/_confusion.txt"
+                #return render_template("grid_classif.html", files=name_image_top_prob, urls=urls_top_prob, target_class=query, use_case=use_case, caption=caption, class1=class1, prob1=string_prob1, fp1=[], fp2=[], class2=class2, prob2=string_prob2, confmatfile="static/_confusion.txt", comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
             else:
                 app.logger.info("...computing the confusion matrix")
                 pred_classes_idx = torch.argmax(text_probs, dim=1)
@@ -220,20 +296,33 @@ def page():
                 #app.logger.info(target)
                 conf_mat = MulticlassConfusionMatrix(num_classes=classes_nbr)
                 confusion = conf_mat(pred,target)
-                # write the matrix in a txt file
-                writeConfMat(confusion)
+                # write the evaluation data
+                writeTensor(pred, eval_folder+use_case+"_pred.txt")
+                writeTensor(target, eval_folder+use_case+"_GT.txt")
+                GT_labels = [labels[i] for i in target]
+                writeList(GT_labels, eval_folder+use_case+"_GT_labels.txt")
+                pred_labels = [labels[i] for i in pred]
+                writeList(pred_labels, eval_folder+use_case+"_pred_labels.txt")
+
                 # https://torchmetrics.readthedocs.io/en/stable/classification/accuracy.html
-                metric = MulticlassAccuracy(num_classes=classes_nbr)
+                metric = MulticlassAccuracy(num_classes=classes_nbr, average="micro")
                 acc = metric(pred,target) * 100.0
-                accuracy = "%.2f" % acc
-                app.logger.info("accuracy (mean of classes): "+ accuracy)
-                metric2 = MulticlassAccuracy(num_classes=classes_nbr, average=None)
-                acc = metric2(pred,target)
-                app.logger.info(acc)
+                accuracy1 = "%.2f" % acc
+                app.logger.info(accuracy1)
+                metric = MulticlassAccuracy(num_classes=classes_nbr, average=None)
+                acc = metric(pred,target)
                 acc_class  = [i * 100.0 for i in acc]
                 acc_class = ["%.2f" % number for number in acc_class]
-                string_acc = ' %  /  '.join(acc_class)
-                return render_template("grid_classif.html", files=name_image_top_prob, urls=urls_top_prob, labels= ' / '.join(labels), nlabels=classes_nbr, target_class=query, caption=caption, prob1=string_prob1, fp=FP, class2=class2, prob2=string_prob2,  confmatfile=conf_mat_file, accuracy1=accuracy, accuracy2=string_acc, comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
+                accuracy2 = ' % / '.join(acc_class)+" %"
+                app.logger.info(accuracy2)
+                # write the matrix in a txt file
+                writeConfMat(confusion, conf_mat_file, accuracy1, accuracy2)
+                confmatfile=conf_mat_file
+                #metric = MulticlassRecall(num_classes=classes_nbr, average=none)
+                #rec = metric(pred,target) * 100.0
+                #recall = "%.2f" % rec
+                #app.logger.info("Recall (mean of classes): "+ recall)
+            return render_template("grid_classif.html", files=name_image_top_prob, urls=urls_top_prob, nlabels=classes_nbr, target_class=query, use_case=use_case, caption=caption, class1=class1, prob1=string_prob1, fp1=FP1, fp2=FP2, class2=class2, prob2=string_prob2, confmatfile=confmatfile, comment="("+str(len(tuples))+ " results, first "+str(maxResults)+" displayed)")
         else:
             ### Image retrieval use case ###
             text_descriptions=[]
@@ -246,9 +335,11 @@ def page():
                 text_features /= text_features.norm(dim=-1, keepdim=True)
             text_probs = (image_features @ text_features.T)
             #app.logger.info(text_probs)
-            sorted_values, indices = torch.sort(text_probs, dim=0,descending=True)
+            sorted_values, indices = torch.sort(text_probs, dim=0, descending=True)
             name_image_top_prob = [image_paths[i] for i in indices[:maxResults]]
-            urls_top_prob = [urls[i] for i in indices[:maxResults]]
+            urls_top_prob = []
+            if len(urls) != 0:
+                urls_top_prob = [urls[i] for i in indices[:maxResults]]
             #app.logger.info(name_image_top_prob)
             prob = sorted_values[:maxResults]
             stringProb = ["%.3f" % number for number in prob]
