@@ -1,7 +1,7 @@
 #!/bin/bash
 # bash script
 
-export FLASK_ARG="dsc"
+export FLASK_ARG="richelieu"
 
 echo "-------------------------"
 if [ -z "${FLASK_ARG}" ]

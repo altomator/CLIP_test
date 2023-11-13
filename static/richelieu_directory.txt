@@ -1,0 +1,78 @@
+walk_dir = static/richelieu
+walk_dir (absolute) = /Users/bnf0016806/Documents/DEV/CLIP_test/CLIP-model-website-main/static/richelieu
+--
+root = static/richelieu
+	- subdirectory Blanc
+	- subdirectory Estampe
+	- subdirectory Partition
+	- subdirectory Photo
+	- subdirectory Plan
+	- subdirectory Pub
+	- subdirectory Recueil
+	- subdirectory Texte
+files: 0
+--
+root = static/richelieu/Blanc
+	-0 : bpt6k1521748g-30.jpg (full path: static/richelieu/Blanc/bpt6k1521748g-30.jpg)
+	-10 : bpt6k1521748g-10.jpg (full path: static/richelieu/Blanc/bpt6k1521748g-10.jpg)
+files: 20
+--
+root = static/richelieu/Estampe
+	-0 : btv1b103026850.jpg (full path: static/richelieu/Estampe/btv1b103026850.jpg)
+	-10 : btv1b8405868z-2.jpg (full path: static/richelieu/Estampe/btv1b8405868z-2.jpg)
+	-20 : btv1b53019111v.jpg (full path: static/richelieu/Estampe/btv1b53019111v.jpg)
+	-30 : btv1b8436538x.jpg (full path: static/richelieu/Estampe/btv1b8436538x.jpg)
+	-40 : btv1b530187305.jpg (full path: static/richelieu/Estampe/btv1b530187305.jpg)
+	-50 : btv1b8438067j.jpg (full path: static/richelieu/Estampe/btv1b8438067j.jpg)
+	-60 : btv1b8414649w.jpg (full path: static/richelieu/Estampe/btv1b8414649w.jpg)
+	-70 : btv1b540010570.jpg (full path: static/richelieu/Estampe/btv1b540010570.jpg)
+	-80 : btv1b53022000h.jpg (full path: static/richelieu/Estampe/btv1b53022000h.jpg)
+	-90 : btv1b53023430m.jpg (full path: static/richelieu/Estampe/btv1b53023430m.jpg)
+files: 99
+--
+root = static/richelieu/Partition
+	-0 : qr146de92a7c06f414fbaa272ad4cc22ace.jpeg (full path: static/richelieu/Partition/qr146de92a7c06f414fbaa272ad4cc22ace.jpeg)
+files: 8
+--
+root = static/richelieu/Photo
+	-0 : btv1b53137476x.jpg (full path: static/richelieu/Photo/btv1b53137476x.jpg)
+	-10 : btv1b90350369.jpg (full path: static/richelieu/Photo/btv1b90350369.jpg)
+	-20 : btv1b6926328c.jpg (full path: static/richelieu/Photo/btv1b6926328c.jpg)
+	-30 : btv1b53166452w.jpg (full path: static/richelieu/Photo/btv1b53166452w.jpg)
+	-40 : btv1b9036124r.jpg (full path: static/richelieu/Photo/btv1b9036124r.jpg)
+	-50 : btv1b69524890.jpg (full path: static/richelieu/Photo/btv1b69524890.jpg)
+files: 60
+--
+root = static/richelieu/Plan
+	-0 : qr12c1f4af70eb14df8b71419b0878d998c_epsg3857.png (full path: static/richelieu/Plan/qr12c1f4af70eb14df8b71419b0878d998c_epsg3857.png)
+	-10 : qr18a33360e59d449f98f0121e0ca55f4aa_epsg3857.png (full path: static/richelieu/Plan/qr18a33360e59d449f98f0121e0ca55f4aa_epsg3857.png)
+	-20 : qr18a20f66e81944737a42a8d4c4aef8147_epsg3857.png (full path: static/richelieu/Plan/qr18a20f66e81944737a42a8d4c4aef8147_epsg3857.png)
+	-30 : btv1b53000267k.jpg (full path: static/richelieu/Plan/btv1b53000267k.jpg)
+	-40 : btv1b53011252k.jpg (full path: static/richelieu/Plan/btv1b53011252k.jpg)
+	-50 : btv1b10303235r.jpg (full path: static/richelieu/Plan/btv1b10303235r.jpg)
+files: 60
+--
+root = static/richelieu/Pub
+	-0 : btv1b9003824d.jpg (full path: static/richelieu/Pub/btv1b9003824d.jpg)
+	-10 : btv1b53167734f.jpg (full path: static/richelieu/Pub/btv1b53167734f.jpg)
+	-20 : btv1b9004387h.jpg (full path: static/richelieu/Pub/btv1b9004387h.jpg)
+	-30 : btv1b10336505m.jpg (full path: static/richelieu/Pub/btv1b10336505m.jpg)
+files: 40
+--
+root = static/richelieu/Recueil
+	-0 : btv1b69027620.jpg (full path: static/richelieu/Recueil/btv1b69027620.jpg)
+	-10 : btv1b84470040-10.jpg (full path: static/richelieu/Recueil/btv1b84470040-10.jpg)
+	-20 : btv1b84700801-79.jpg (full path: static/richelieu/Recueil/btv1b84700801-79.jpg)
+	-30 : btv1b69029292.jpg (full path: static/richelieu/Recueil/btv1b69029292.jpg)
+	-40 : btv1b84700801-58.jpg (full path: static/richelieu/Recueil/btv1b84700801-58.jpg)
+	-50 : btv1b84700801-315.jpg (full path: static/richelieu/Recueil/btv1b84700801-315.jpg)
+	-60 : btv1b84700801-271.jpg (full path: static/richelieu/Recueil/btv1b84700801-271.jpg)
+	-70 : btv1b84700801-215.jpg (full path: static/richelieu/Recueil/btv1b84700801-215.jpg)
+	-80 : btv1b84700801-202.jpg (full path: static/richelieu/Recueil/btv1b84700801-202.jpg)
+	-90 : btv1b84470040-18.jpg (full path: static/richelieu/Recueil/btv1b84470040-18.jpg)
+files: 100
+--
+root = static/richelieu/Texte
+	-0 : btv1b8405868z-6.jpg (full path: static/richelieu/Texte/btv1b8405868z-6.jpg)
+	-10 : btv1b84700801-8.jpg (full path: static/richelieu/Texte/btv1b84700801-8.jpg)
+files: 17

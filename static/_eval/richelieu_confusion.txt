@@ -1,0 +1,15 @@
+GT\pred Blanc	Estam	Parti	Photo	Plan	Pub	Recue	Texte
+
+Blanc	18	1	0	1	0	0	0	0
+Estam	0	86	1	0	2	2	4	4
+Parti	0	0	8	0	0	0	0	0
+Photo	0	1	0	59	0	0	0	0
+Plan	0	0	1	0	59	0	0	0
+Pub	0	3	1	0	0	28	6	2
+Recue	0	13	0	16	5	0	66	0
+Texte	0	0	1	0	0	0	7	9
+
+Accuracy (micro average): 82.43
+Accuracy (per classe): 
+Blanc / Estampe / Partition / Photo / Plan / Pub / Recueil / Texte
+90.00 % / 86.87 % / 100.00 % / 98.33 % / 98.33 % / 70.00 % / 66.00 % / 52.94 %
