@@ -31,7 +31,7 @@ Finally, launch the web app:
 ```
 and open this URL http://127.0.0.1:5000 in your browser.
 
-*Note: the whole workflow can be ran using the bash script ``run.sh``.*
+*Note: the whole workflow can be ran using the bash script ``run.sh``. If the image folder is changed, the entire workflow must be restarted. *
 
 The web app displays a random selection of images and a prompt field.
 
@@ -54,6 +54,8 @@ These class names will be listed to the user on the home page and the model will
 The results list shows the most likely images for the requested class, the probability and the second most likely class. In this example, we are looking for drawings in newspapers.
 
 ![Classification](screen/classify.png)
+
+*Note: if the captions are changed, the flask app must be launched again.* 
 
 ### Evaluation 
 If images are sorted into subfolders based on class names, a confusion matrix will be calculated and displayed after the results list.
