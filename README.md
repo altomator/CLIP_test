@@ -31,7 +31,7 @@ Finally, launch the web app:
 ```
 and open this URL http://127.0.0.1:5000 in your browser.
 
-*Note: the whole workflow can be ran using the bash script ``run.sh``. If the image folder is changed, the entire workflow must be restarted. *
+*Note: the whole workflow can be ran using the bash script ``run.sh``. If the image folder is changed, the entire workflow must be restarted.*
 
 The web app displays a random selection of images and a prompt field.
 
